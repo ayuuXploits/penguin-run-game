@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Penguin Run</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a1628;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Nunito', sans-serif;
+    overflow: hidden;
+  }
+
+  h1 {
+    font-family: 'Fredoka One', cursive;
+    color: #a8e4f7;
+    font-size: 2.8rem;
+    letter-spacing: 3px;
+    text-shadow: 0 0 30px #4fc8e8, 0 4px 0 #0d3a5c;
+    margin-bottom: 8px;
+  }
+
+  #scoreBoard {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 16px;
+  }
+
+  .score-item {
+    text-align: center;
+    color: #a8e4f7;
+  }
+
+  .score-label {
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .score-value {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: #fff;
+    text-shadow: 0 0 10px #4fc8e8;
+  }
+
+  #gameContainer {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(79,200,232,0.25), 0 20px 60px rgba(0,0,0,0.5);
+    border: 2px solid rgba(79,200,232,0.3);
+  }
+
+  canvas {
+    display: block;
+  }
+
+  #overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(10,22,40,0.88);
+    backdrop-filter: blur(4px);
+    transition: opacity 0.3s;
+  }
+
+  #overlay.hidden { opacity: 0; pointer-events: none; }
+
+  .overlay-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 3rem;
+    color: #fff;
+    text-shadow: 0 0 30px #4fc8e8;
+    margin-bottom: 8px;
+  }
+
+  .overlay-sub {
+    color: #a8e4f7;
+    font-size: 1rem;
+    margin-bottom: 32px;
+    opacity: 0.8;
+  }
+
+  .btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    padding: 14px 48px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #4fc8e8, #1a8aad);
+    color: #fff;
+    box-shadow: 0 6px 24px rgba(79,200,232,0.4), 0 2px 0 rgba(0,0,0,0.2);
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(79,200,232,0.5); }
+  .btn:active { transform: translateY(1px); }
+
+  #hint {
+    margin-top: 16px;
+    color: #7ec8da;
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+
+  #finalScore {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.4rem;
+    color: #ffd166;
+    margin-bottom: 24px;
+    text-shadow: 0 0 12px rgba(255,209,102,0.5);
+  }
+</style>
+</head>
+<body>
+
+<h1>🐧 PENGUIN RUN</h1>
+
+<div id="scoreBoard">
+  <div class="score-item">
+    <div class="score-label">Score</div>
+    <div class="score-value" id="scoreDisplay">0</div>
+  </div>
+  <div class="score-item">
+    <div class="score-label">Best</div>
+    <div class="score-value" id="bestDisplay">0</div>
+  </div>
+  <div class="score-item">
+    <div class="score-label">Level</div>
+    <div class="score-value" id="levelDisplay">1</div>
+  </div>
+</div>
+
+<div id="gameContainer">
+  <canvas id="canvas" width="700" height="250"></canvas>
+  <div id="overlay">
+    <div class="overlay-title" id="overlayTitle">PENGUIN RUN</div>
+    <div class="overlay-sub" id="overlaySub">Dodge the icebergs and survive!</div>
+    <div id="finalScore"></div>
+    <button class="btn" id="startBtn">PLAY</button>
+    <div id="hint">SPACE / TAP to Jump &nbsp;·&nbsp; Double Jump allowed!</div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const W = canvas.width, H = canvas.height;
+const GROUND = H - 50;
+
+let state = 'idle'; // idle, playing, dead
+let score = 0, best = 0, level = 1;
+let frame = 0;
+let speed = 4;
+let animFrame;
+
+// Stars
+const stars = Array.from({length:60}, () => ({
+  x: Math.random()*W, y: Math.random()*(GROUND-40),
+  r: Math.random()*1.5+0.3, t: Math.random()*Math.PI*2
+}));
+
+// Penguin
+const penguin = {
+  x: 90, y: GROUND, w: 36, h: 48,
+  vy: 0, jumps: 0, maxJumps: 2,
+  dead: false,
+  legPhase: 0,
+  wingPhase: 0,
+  squish: 1,
+  get top() { return this.y - this.h; },
+  get right() { return this.x + this.w/2; },
+  get left() { return this.x - this.w/2; }
+};
+
+// Obstacles
+let obstacles = [];
+let obTimer = 0;
+let obInterval = 90;
+
+// Particles
+let particles = [];
+
+// Snowflakes
+let snowflakes = Array.from({length:30}, () => ({
+  x: Math.random()*W, y: Math.random()*H,
+  s: Math.random()*2+0.5, spd: Math.random()*0.8+0.3
+}));
+
+// Mountains (parallax bg)
+let mountains = [];
+for(let i=0;i<8;i++) mountains.push({x:i*(W/4), h:50+Math.random()*60});
+
+function jump() {
+  if(state === 'idle' || state === 'dead') { startGame(); return; }
+  if(penguin.jumps < penguin.maxJumps) {
+    penguin.vy = -13;
+    penguin.jumps++;
+    penguin.squish = 0.7;
+    spawnJumpParticles();
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if(e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); }
+});
+canvas.addEventListener('click', jump);
+document.getElementById('startBtn').addEventListener('click', startGame);
+
+function startGame() {
+  state = 'playing';
+  score = 0; level = 1; speed = 4; frame = 0;
+  obstacles = []; particles = []; obTimer = 0; obInterval = 90;
+  penguin.y = GROUND; penguin.vy = 0; penguin.jumps = 0; penguin.dead = false;
+  penguin.legPhase = 0; penguin.wingPhase = 0; penguin.squish = 1;
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('finalScore').textContent = '';
+  if(animFrame) cancelAnimationFrame(animFrame);
+  loop();
+}
+
+function showDead() {
+  state = 'dead';
+  if(score > best) best = score;
+  document.getElementById('bestDisplay').textContent = best;
+  const ol = document.getElementById('overlay');
+  ol.classList.remove('hidden');
+  document.getElementById('overlayTitle').textContent = 'GAME OVER';
+  document.getElementById('overlaySub').textContent = 'The iceberg got you!';
+  document.getElementById('finalScore').textContent = `Score: ${score}${score===best?' 🏆 New Best!':''}`;
+  document.getElementById('startBtn').textContent = 'TRY AGAIN';
+}
+
+function spawnJumpParticles() {
+  for(let i=0;i<8;i++) {
+    particles.push({
+      x: penguin.x, y: penguin.y,
+      vx: (Math.random()-0.5)*3, vy: Math.random()*-2-1,
+      life: 1, r: Math.random()*3+2,
+      color: `hsl(${180+Math.random()*40},80%,70%)`
+    });
+  }
+}
+
+function spawnDeathParticles() {
+  for(let i=0;i<20;i++) {
+    particles.push({
+      x: penguin.x, y: penguin.y - penguin.h/2,
+      vx: (Math.random()-0.5)*8, vy: Math.random()*-8-2,
+      life: 1, r: Math.random()*5+3,
+      color: `hsl(${200+Math.random()*30},70%,${60+Math.random()*20}%)`
+    });
+  }
+}
+
+function spawnObstacle() {
+  const types = ['small','medium','large','double'];
+  const type = types[Math.floor(Math.random()*types.length)];
+  if(type === 'double') {
+    obstacles.push({x:W+20, type:'small', w:22, h:38});
+    obstacles.push({x:W+68, type:'small', w:22, h:38});
+  } else {
+    const sizes = {small:{w:22,h:38}, medium:{w:30,h:52}, large:{w:38,h:66}};
+    const s = sizes[type];
+    obstacles.push({x:W+20, type, ...s});
+  }
+}
+
+function drawBackground() {
+  // Sky gradient
+  const sky = ctx.createLinearGradient(0,0,0,GROUND);
+  sky.addColorStop(0, '#08112a');
+  sky.addColorStop(1, '#0d2444');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0,0,W,GROUND);
+
+  // Stars twinkle
+  stars.forEach(s => {
+    s.t += 0.03;
+    const alpha = 0.4 + 0.6*Math.abs(Math.sin(s.t));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(200,235,255,${alpha})`;
+    ctx.fill();
+  });
+
+  // Aurora
+  ctx.save();
+  ctx.globalAlpha = 0.07 + 0.04*Math.sin(frame*0.01);
+  const aurora = ctx.createLinearGradient(0,20,0,100);
+  aurora.addColorStop(0,'transparent');
+  aurora.addColorStop(0.5,'rgba(79,200,232,1)');
+  aurora.addColorStop(1,'transparent');
+  ctx.fillStyle = aurora;
+  ctx.fillRect(0,20,W,80);
+  ctx.globalAlpha = 0.05 + 0.03*Math.sin(frame*0.013+1);
+  const aurora2 = ctx.createLinearGradient(0,40,0,120);
+  aurora2.addColorStop(0,'transparent');
+  aurora2.addColorStop(0.5,'rgba(100,255,180,1)');
+  aurora2.addColorStop(1,'transparent');
+  ctx.fillStyle = aurora2;
+  ctx.fillRect(0,40,W,80);
+  ctx.restore();
+
+  // Distant mountains (slow parallax)
+  ctx.save();
+  mountains.forEach(m => {
+    m.x -= speed * 0.15;
+    if(m.x < -W/4) m.x += W + W/4;
+    ctx.beginPath();
+    ctx.moveTo(m.x, GROUND);
+    ctx.lineTo(m.x + 60, GROUND - m.h);
+    ctx.lineTo(m.x + 120, GROUND);
+    ctx.fillStyle = 'rgba(20,50,90,0.6)';
+    ctx.fill();
+    // Snow cap
+    ctx.beginPath();
+    ctx.moveTo(m.x+60, GROUND-m.h);
+    ctx.lineTo(m.x+45, GROUND-m.h+20);
+    ctx.lineTo(m.x+75, GROUND-m.h+20);
+    ctx.fillStyle = 'rgba(180,220,255,0.4)';
+    ctx.fill();
+  });
+  ctx.restore();
+
+  // Ground
+  const grd = ctx.createLinearGradient(0,GROUND,0,H);
+  grd.addColorStop(0,'#c8e8f8');
+  grd.addColorStop(0.3,'#a0d0f0');
+  grd.addColorStop(1,'#7ab8e0');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0,GROUND,W,H-GROUND);
+
+  // Ice texture lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+  ctx.lineWidth = 1;
+  for(let i=0;i<6;i++){
+    ctx.beginPath();
+    ctx.moveTo(0, GROUND+5+i*8);
+    ctx.lineTo(W, GROUND+5+i*8);
+    ctx.stroke();
+  }
+
+  // Ground top glint
+  ctx.beginPath();
+  ctx.moveTo(0,GROUND);
+  ctx.lineTo(W,GROUND);
+  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function drawObstacle(o) {
+  const bx = o.x, by = GROUND, bw = o.w, bh = o.h;
+  // Iceberg shape
+  ctx.save();
+  ctx.beginPath();
+  // Jagged top
+  const pts = [
+    [bx, by],
+    [bx + bw*0.1, by - bh*0.4],
+    [bx + bw*0.25, by - bh*0.7],
+    [bx + bw*0.45, by - bh],
+    [bx + bw*0.6, by - bh*0.8],
+    [bx + bw*0.75, by - bh*0.9],
+    [bx + bw*0.9, by - bh*0.5],
+    [bx + bw, by]
+  ];
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  pts.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+  ctx.closePath();
+
+  const ig = ctx.createLinearGradient(bx, by-bh, bx+bw, by);
+  ig.addColorStop(0,'#e8f6ff');
+  ig.addColorStop(0.4,'#a8d8f0');
+  ig.addColorStop(1,'#6ab0d8');
+  ctx.fillStyle = ig;
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Shine
+  ctx.beginPath();
+  ctx.moveTo(bx+bw*0.2, by-bh*0.5);
+  ctx.lineTo(bx+bw*0.35, by-bh*0.85);
+  ctx.lineTo(bx+bw*0.5, by-bh*0.6);
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawPenguin() {
+  const px = penguin.x, py = penguin.y;
+  const sy = penguin.squish;
+  const sx = 2 - sy;
+
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.scale(sx, sy);
+
+  // Shadow
+  ctx.save();
+  ctx.scale(1, 0.3);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, 18*sx, 8, 0, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.fill();
+  ctx.restore();
+
+  // Feet
+  const legOff = state==='playing' ? Math.sin(penguin.legPhase)*5 : 0;
+  ctx.fillStyle = '#ff9900';
+  ctx.beginPath();
+  ctx.ellipse(-8, -4 + legOff, 7, 4, -0.3, 0, Math.PI*2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(8, -4 - legOff, 7, 4, 0.3, 0, Math.PI*2);
+  ctx.fill();
+
+  // Body
+  const bodyGrad = ctx.createRadialGradient(-4,-22,5,0,-20,22);
+  bodyGrad.addColorStop(0,'#3a3a4a');
+  bodyGrad.addColorStop(1,'#111118');
+  ctx.beginPath();
+  ctx.ellipse(0,-22,14,22,0,0,Math.PI*2);
+  ctx.fillStyle = bodyGrad;
+  ctx.fill();
+
+  // Belly
+  ctx.beginPath();
+  ctx.ellipse(1,-20,8,14,0,0,Math.PI*2);
+  ctx.fillStyle = '#f0f0f8';
+  ctx.fill();
+
+  // Wings
+  const wingAngle = state==='playing' ? Math.sin(penguin.wingPhase)*0.4 : 0.1;
+  ctx.save();
+  ctx.translate(-14,-24);
+  ctx.rotate(-0.3 - wingAngle);
+  ctx.beginPath();
+  ctx.ellipse(0,0,5,13,0.3,0,Math.PI*2);
+  ctx.fillStyle = '#1e1e28';
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(14,-24);
+  ctx.rotate(0.3 + wingAngle);
+  ctx.beginPath();
+  ctx.ellipse(0,0,5,13,-0.3,0,Math.PI*2);
+  ctx.fillStyle = '#1e1e28';
+  ctx.fill();
+  ctx.restore();
+
+  // Head
+  ctx.beginPath();
+  ctx.arc(0,-38,13,0,Math.PI*2);
+  ctx.fillStyle = '#111118';
+  ctx.fill();
+
+  // Face patch
+  ctx.beginPath();
+  ctx.ellipse(1,-38,8,9,0,0,Math.PI*2);
+  ctx.fillStyle = '#f0f0f8';
+  ctx.fill();
+
+  // Eyes
+  ctx.beginPath();
+  ctx.arc(-4,-39,3,0,Math.PI*2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(-4,-39,1.5,0,Math.PI*2);
+  ctx.fillStyle = '#111';
+  ctx.fill();
+  // Eye shine
+  ctx.beginPath();
+  ctx.arc(-4.7,-39.7,0.6,0,Math.PI*2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+
+  // Beak
+  ctx.beginPath();
+  ctx.moveTo(3,-36);
+  ctx.lineTo(10,-37);
+  ctx.lineTo(3,-34);
+  ctx.closePath();
+  ctx.fillStyle = '#ff8800';
+  ctx.fill();
+
+  // Scarf
+  ctx.beginPath();
+  ctx.arc(0,-28,13,0.3,Math.PI-0.3);
+  ctx.lineWidth=4;
+  ctx.strokeStyle='#e84040';
+  ctx.stroke();
+  // Scarf end
+  ctx.beginPath();
+  ctx.moveTo(11,-30);
+  ctx.lineTo(15,-22);
+  ctx.lineTo(9,-20);
+  ctx.lineTo(9,-26);
+  ctx.fillStyle='#e84040';
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawSnow() {
+  snowflakes.forEach(sf => {
+    sf.x -= speed * 0.3 + sf.spd;
+    sf.y += sf.spd * 0.5;
+    if(sf.x < 0) { sf.x = W; sf.y = Math.random()*GROUND; }
+    if(sf.y > GROUND) { sf.y = 0; sf.x = Math.random()*W; }
+    ctx.beginPath();
+    ctx.arc(sf.x, sf.y, sf.s, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fill();
+  });
+}
+
+function drawParticles() {
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = p.life;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+}
+
+function updateParticles() {
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.2;
+    p.life -= 0.03;
+  });
+  particles = particles.filter(p => p.life > 0);
+}
+
+function checkCollision(o) {
+  const px = penguin.x, py = penguin.top;
+  const ox = o.x + o.w/2, oy = GROUND - o.h;
+  const dx = Math.abs(px - ox);
+  const dy = Math.abs((py + penguin.h/2) - (oy + o.h/2));
+  return dx < (14 + o.w/2 - 4) && dy < (penguin.h/2 + o.h/2 - 8);
+}
+
+function loop() {
+  frame++;
+  ctx.clearRect(0,0,W,H);
+  drawBackground();
+  drawSnow();
+
+  if(state === 'playing') {
+    // Speed ramp
+    speed = 4 + score * 0.003;
+    level = Math.floor(score / 200) + 1;
+    obInterval = Math.max(45, 90 - level * 5);
+
+    // Penguin physics
+    penguin.vy += 0.7;
+    penguin.y += penguin.vy;
+    if(penguin.y >= GROUND) {
+      penguin.y = GROUND;
+      penguin.vy = 0;
+      penguin.jumps = 0;
+    }
+
+    // Animations
+    penguin.squish += (1 - penguin.squish) * 0.15;
+    if(penguin.y === GROUND) penguin.legPhase += 0.3;
+    penguin.wingPhase += 0.15;
+
+    // Score
+    score++;
+    document.getElementById('scoreDisplay').textContent = score;
+    document.getElementById('levelDisplay').textContent = level;
+
+    // Obstacles
+    obTimer++;
+    if(obTimer >= obInterval) {
+      spawnObstacle();
+      obTimer = 0;
+    }
+
+    obstacles.forEach(o => { o.x -= speed; });
+    obstacles = obstacles.filter(o => o.x > -60);
+
+    // Collision
+    obstacles.forEach(o => {
+      if(checkCollision(o)) {
+        spawnDeathParticles();
+        showDead();
+      }
+    });
+  }
+
+  // Draw obstacles
+  obstacles.forEach(drawObstacle);
+
+  // Draw penguin
+  drawPenguin();
+
+  drawParticles();
+  updateParticles();
+
+  // HUD level stars
+  if(state === 'playing' && score % 200 === 0 && score > 0 && frame > 10) {
+    // Flash level up
+  }
+
+  animFrame = requestAnimationFrame(loop);
+}
+
+// Initial draw
+loop();
+</script>
+</body>
+</html>
