@@ -13,7 +13,7 @@
 
 🎮 About
 Penguin Run HD is a fully self-contained, single-file browser game. You play as a penguin sprinting across a frozen arctic landscape, leaping over icebergs while a relentless sea lion closes in from behind. The longer you survive, the faster it gets.
-No frameworks. No build tools. No server. Just open index.html and play.
+No frameworks. No build tools. No server. Just open index.html and play.....
 
 ✨ Features
 Core Gameplay
