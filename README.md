@@ -73,7 +73,7 @@ InputActionSpace / ↑ / TapJump (hold for double jump)SOpen ShopMOpen MissionsE
 🚀 Getting Started
 No installation required.
 bash# Clone the repo
-git clone https://github.com/your-username/penguin-run-hd.git
+git clone https://github.com/ayuuXploits/penguin-run-hd.git
 
 # Open in your browser
 open index.html
