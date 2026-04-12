@@ -88,6 +88,9 @@ index.html
 ├── Save system         — localStorage with versioned save key
 ├── Mission engine      — Daily + long-term with progress tracking
 └── Shop system         — Skins, sceneries, consumable power-ups
+
+
+
 Key technical details:
 
 Two layered <canvas> elements — main game canvas + speed lines overlay
