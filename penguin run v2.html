@@ -1044,9 +1044,6 @@ function confirmName(){
   document.getElementById('playBtn').textContent='▶ PLAY';
 }
 
-/* ════════════════════════════════════
-   INPUT
-════════════════════════════════════ */
 document.addEventListener('keydown',e=>{
   if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault(); doJump();}
   if(e.code==='KeyS'&&gState!=='name') openShop();
