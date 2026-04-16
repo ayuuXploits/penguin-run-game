@@ -18,8 +18,8 @@ No frameworks. No build tools. No server. Just open index.html and play.....
 ✨ Features
 Core Gameplay
 
-Endless runner with procedurally generated iceberg obstacles
-Double jump mechanic for precise obstacle navigation
+Endless runner with procedurally generated iceberg obstacles.
+Double jump mechanic for precise obstacle navigation.
 Dynamic difficulty — speed and obstacle frequency scale with your score
 Sea lion pursuer that appears at score 200 and never stops chasing
 Panic vignette — red screen edges pulse as the sea lion gets dangerously close
