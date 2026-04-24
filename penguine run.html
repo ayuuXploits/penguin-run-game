@@ -1,133 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Penguin Run</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penguin Run</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  body {
-    background: #0a1628;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    font-family: 'Nunito', sans-serif;
-    overflow: hidden;
-  }
+    body {
+      background: linear-gradient(135deg, #0a1628 0%, #0d2240 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Nunito', sans-serif;
+      overflow: hidden;
+    }
 
-  h1 {
-    font-family: 'Fredoka One', cursive;
-    color: #a8e4f7;
-    font-size: 2.8rem;
-    letter-spacing: 3px;
-    text-shadow: 0 0 30px #4fc8e8, 0 4px 0 #0d3a5c;
-    margin-bottom: 8px;
-  }
+    h1 {
+      font-family: 'Fredoka One', cursive;
+      color: #a8e4f7;
+      font-size: 2.8rem;
+      letter-spacing: 3px;
+      text-shadow: 0 0 30px #4fc8e8, 0 4px 0 #0d3a5c;
+      margin-bottom: 8px;
+      animation: titlePulse 3s ease-in-out infinite;
+    }
 
-  #scoreBoard {
-    display: flex;
-    gap: 40px;
-    margin-bottom: 16px;
-  }
+    @keyframes titlePulse {
+      0%, 100% { text-shadow: 0 0 30px #4fc8e8, 0 4px 0 #0d3a5c; }
+      50% { text-shadow: 0 0 40px #4fc8e8, 0 4px 0 #0d3a5c; }
+    }
 
-  .score-item {
-    text-align: center;
-    color: #a8e4f7;
-  }
+    #scoreBoard {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 16px;
+    }
 
-  .score-label {
-    font-size: 0.7rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    opacity: 0.7;
-  }
+    .score-item {
+      text-align: center;
+      color: #a8e4f7;
+    }
 
-  .score-value {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.8rem;
-    color: #fff;
-    text-shadow: 0 0 10px #4fc8e8;
-  }
+    .score-label {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
 
-  #gameContainer {
-    position: relative;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 0 60px rgba(79,200,232,0.25), 0 20px 60px rgba(0,0,0,0.5);
-    border: 2px solid rgba(79,200,232,0.3);
-  }
+    .score-value {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.8rem;
+      color: #fff;
+      text-shadow: 0 0 10px #4fc8e8;
+      transition: transform 0.2s ease-out;
+    }
 
-  canvas {
-    display: block;
-  }
+    .score-value.pulse {
+      animation: scorePulse 0.3s ease-out;
+    }
 
-  #overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(10,22,40,0.88);
-    backdrop-filter: blur(4px);
-    transition: opacity 0.3s;
-  }
+    @keyframes scorePulse {
+      0% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
 
-  #overlay.hidden { opacity: 0; pointer-events: none; }
+    #gameContainer {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(79,200,232,0.25), 0 20px 60px rgba(0,0,0,0.5);
+      border: 2px solid rgba(79,200,232,0.3);
+      background: #000;
+    }
 
-  .overlay-title {
-    font-family: 'Fredoka One', cursive;
-    font-size: 3rem;
-    color: #fff;
-    text-shadow: 0 0 30px #4fc8e8;
-    margin-bottom: 8px;
-  }
+    canvas {
+      display: block;
+    }
 
-  .overlay-sub {
-    color: #a8e4f7;
-    font-size: 1rem;
-    margin-bottom: 32px;
-    opacity: 0.8;
-  }
+    #overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10,22,40,0.92);
+      backdrop-filter: blur(4px);
+      transition: opacity 0.3s ease-out;
+      z-index: 10;
+    }
 
-  .btn {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.3rem;
-    letter-spacing: 2px;
-    padding: 14px 48px;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    background: linear-gradient(135deg, #4fc8e8, #1a8aad);
-    color: #fff;
-    box-shadow: 0 6px 24px rgba(79,200,232,0.4), 0 2px 0 rgba(0,0,0,0.2);
-    transition: transform 0.1s, box-shadow 0.1s;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  }
+    #overlay.hidden { 
+      opacity: 0; 
+      pointer-events: none; 
+    }
 
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(79,200,232,0.5); }
-  .btn:active { transform: translateY(1px); }
+    .overlay-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 3rem;
+      color: #fff;
+      text-shadow: 0 0 30px #4fc8e8;
+      margin-bottom: 8px;
+      animation: fadeInScale 0.5s ease-out;
+    }
 
-  #hint {
-    margin-top: 16px;
-    color: #7ec8da;
-    font-size: 0.85rem;
-    opacity: 0.7;
-  }
+    .overlay-sub {
+      color: #a8e4f7;
+      font-size: 1rem;
+      margin-bottom: 32px;
+      opacity: 0.8;
+      animation: fadeIn 0.7s ease-out 0.1s backwards;
+    }
 
-  #finalScore {
-    font-family: 'Fredoka One', cursive;
-    font-size: 1.4rem;
-    color: #ffd166;
-    margin-bottom: 24px;
-    text-shadow: 0 0 12px rgba(255,209,102,0.5);
-  }
-</style>
+    #finalScore {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.4rem;
+      color: #ffd166;
+      margin-bottom: 24px;
+      text-shadow: 0 0 12px rgba(255,209,102,0.5);
+      animation: fadeIn 0.7s ease-out 0.2s backwards;
+      min-height: 1.8rem;
+    }
+
+    .btn {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+      padding: 14px 48px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #4fc8e8, #1a8aad);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(79,200,232,0.4), 0 2px 0 rgba(0,0,0,0.2);
+      transition: transform 0.1s, box-shadow 0.1s;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      animation: fadeIn 0.7s ease-out 0.3s backwards;
+    }
+
+    .btn:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 10px 30px rgba(79,200,232,0.5); 
+    }
+
+    .btn:active { 
+      transform: translateY(1px); 
+    }
+
+    #hint {
+      margin-top: 16px;
+      color: #7ec8da;
+      font-size: 0.85rem;
+      opacity: 0.7;
+      animation: fadeIn 0.7s ease-out 0.4s backwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @media (max-width: 800px) {
+      h1 { font-size: 2rem; }
+      #scoreBoard { gap: 20px; }
+      .score-value { font-size: 1.4rem; }
+      canvas { width: 100%; height: auto; }
+    }
+  </style>
 </head>
 <body>
 
@@ -160,443 +210,609 @@
 </div>
 
 <script>
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+  // ==================== Game Configuration ====================
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  const W = canvas.width;
+  const H = canvas.height;
+  const GROUND = H - 50;
+  
+  const PHYSICS = {
+    GRAVITY: 0.7,
+    JUMP_POWER: 13,
+    MAX_JUMPS: 2,
+    SQUISH_RECOVERY: 0.15,
+    SQUISH_ON_JUMP: 0.7,
+    LEG_ANIMATION_SPEED: 0.3,
+    WING_ANIMATION_SPEED: 0.15
+  };
+  
+  const GAME_CONFIG = {
+    INITIAL_SPEED: 4,
+    SPEED_INCREMENT: 0.003,
+    BASE_OBSTACLE_INTERVAL: 90,
+    MIN_OBSTACLE_INTERVAL: 45,
+    LEVEL_INTERVAL: 200,
+    OBSTACLE_SPACING: 48
+  };
 
-const W = canvas.width, H = canvas.height;
-const GROUND = H - 50;
+  // ==================== Game State ====================
+  let gameState = 'idle'; // 'idle', 'playing', 'dead'
+  let score = 0;
+  let bestScore = 0;
+  let level = 1;
+  let frameCount = 0;
+  let gameSpeed = GAME_CONFIG.INITIAL_SPEED;
+  let animFrameId = null;
 
-let state = 'idle'; // idle, playing, dead
-let score = 0, best = 0, level = 1;
-let frame = 0;
-let speed = 4;
-let animFrame;
+  // ==================== Game Objects ====================
+  
+  // Background stars
+  const stars = Array.from({ length: 60 }, () => ({
+    x: Math.random() * W,
+    y: Math.random() * (GROUND - 40),
+    r: Math.random() * 1.5 + 0.3,
+    t: Math.random() * Math.PI * 2
+  }));
 
-// Stars
-const stars = Array.from({length:60}, () => ({
-  x: Math.random()*W, y: Math.random()*(GROUND-40),
-  r: Math.random()*1.5+0.3, t: Math.random()*Math.PI*2
-}));
+  // Penguin character
+  const penguin = {
+    x: 90,
+    y: GROUND,
+    w: 36,
+    h: 48,
+    vy: 0,
+    jumps: 0,
+    maxJumps: PHYSICS.MAX_JUMPS,
+    dead: false,
+    legPhase: 0,
+    wingPhase: 0,
+    squish: 1,
+    
+    get top() { return this.y - this.h; },
+    get right() { return this.x + this.w / 2; },
+    get left() { return this.x - this.w / 2; }
+  };
 
-// Penguin
-const penguin = {
-  x: 90, y: GROUND, w: 36, h: 48,
-  vy: 0, jumps: 0, maxJumps: 2,
-  dead: false,
-  legPhase: 0,
-  wingPhase: 0,
-  squish: 1,
-  get top() { return this.y - this.h; },
-  get right() { return this.x + this.w/2; },
-  get left() { return this.x - this.w/2; }
-};
+  // Obstacles
+  let obstacles = [];
+  let obstacleSpawner = {
+    timer: 0,
+    interval: GAME_CONFIG.BASE_OBSTACLE_INTERVAL
+  };
 
-// Obstacles
-let obstacles = [];
-let obTimer = 0;
-let obInterval = 90;
+  // Particles
+  let particles = [];
 
-// Particles
-let particles = [];
+  // Snowflakes
+  const snowflakes = Array.from({ length: 30 }, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    s: Math.random() * 2 + 0.5,
+    spd: Math.random() * 0.8 + 0.3
+  }));
 
-// Snowflakes
-let snowflakes = Array.from({length:30}, () => ({
-  x: Math.random()*W, y: Math.random()*H,
-  s: Math.random()*2+0.5, spd: Math.random()*0.8+0.3
-}));
+  // Mountains (parallax background)
+  const mountains = Array.from({ length: 8 }, (_, i) => ({
+    x: i * (W / 4),
+    h: 50 + Math.random() * 60
+  }));
 
-// Mountains (parallax bg)
-let mountains = [];
-for(let i=0;i<8;i++) mountains.push({x:i*(W/4), h:50+Math.random()*60});
-
-function jump() {
-  if(state === 'idle' || state === 'dead') { startGame(); return; }
-  if(penguin.jumps < penguin.maxJumps) {
-    penguin.vy = -13;
-    penguin.jumps++;
-    penguin.squish = 0.7;
-    spawnJumpParticles();
+  // ==================== Input Handling ====================
+  
+  function handleJump() {
+    if (gameState === 'idle' || gameState === 'dead') {
+      startGame();
+      return;
+    }
+    
+    if (penguin.jumps < penguin.maxJumps) {
+      penguin.vy = -PHYSICS.JUMP_POWER;
+      penguin.jumps++;
+      penguin.squish = PHYSICS.SQUISH_ON_JUMP;
+      spawnJumpParticles();
+    }
   }
-}
 
-document.addEventListener('keydown', e => {
-  if(e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); jump(); }
-});
-canvas.addEventListener('click', jump);
-document.getElementById('startBtn').addEventListener('click', startGame);
-
-function startGame() {
-  state = 'playing';
-  score = 0; level = 1; speed = 4; frame = 0;
-  obstacles = []; particles = []; obTimer = 0; obInterval = 90;
-  penguin.y = GROUND; penguin.vy = 0; penguin.jumps = 0; penguin.dead = false;
-  penguin.legPhase = 0; penguin.wingPhase = 0; penguin.squish = 1;
-  document.getElementById('overlay').classList.add('hidden');
-  document.getElementById('finalScore').textContent = '';
-  if(animFrame) cancelAnimationFrame(animFrame);
-  loop();
-}
-
-function showDead() {
-  state = 'dead';
-  if(score > best) best = score;
-  document.getElementById('bestDisplay').textContent = best;
-  const ol = document.getElementById('overlay');
-  ol.classList.remove('hidden');
-  document.getElementById('overlayTitle').textContent = 'GAME OVER';
-  document.getElementById('overlaySub').textContent = 'The iceberg got you!';
-  document.getElementById('finalScore').textContent = `Score: ${score}${score===best?' 🏆 New Best!':''}`;
-  document.getElementById('startBtn').textContent = 'TRY AGAIN';
-}
-
-function spawnJumpParticles() {
-  for(let i=0;i<8;i++) {
-    particles.push({
-      x: penguin.x, y: penguin.y,
-      vx: (Math.random()-0.5)*3, vy: Math.random()*-2-1,
-      life: 1, r: Math.random()*3+2,
-      color: `hsl(${180+Math.random()*40},80%,70%)`
-    });
-  }
-}
-
-function spawnDeathParticles() {
-  for(let i=0;i<20;i++) {
-    particles.push({
-      x: penguin.x, y: penguin.y - penguin.h/2,
-      vx: (Math.random()-0.5)*8, vy: Math.random()*-8-2,
-      life: 1, r: Math.random()*5+3,
-      color: `hsl(${200+Math.random()*30},70%,${60+Math.random()*20}%)`
-    });
-  }
-}
-
-function spawnObstacle() {
-  const types = ['small','medium','large','double'];
-  const type = types[Math.floor(Math.random()*types.length)];
-  if(type === 'double') {
-    obstacles.push({x:W+20, type:'small', w:22, h:38});
-    obstacles.push({x:W+68, type:'small', w:22, h:38});
-  } else {
-    const sizes = {small:{w:22,h:38}, medium:{w:30,h:52}, large:{w:38,h:66}};
-    const s = sizes[type];
-    obstacles.push({x:W+20, type, ...s});
-  }
-}
-
-function drawBackground() {
-  const sky = ctx.createLinearGradient(0,0,0,GROUND);
-  sky.addColorStop(0, '#08112a');
-  sky.addColorStop(1, '#0d2444');
-  ctx.fillStyle = sky;
-  ctx.fillRect(0,0,W,GROUND);
-
-  stars.forEach(s => {
-    s.t += 0.03;
-    const alpha = 0.4 + 0.6*Math.abs(Math.sin(s.t));
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-    ctx.fillStyle = `rgba(200,235,255,${alpha})`;
-    ctx.fill();
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' || e.code === 'ArrowUp') {
+      e.preventDefault();
+      handleJump();
+    }
   });
 
-  ctx.save();
-  ctx.globalAlpha = 0.07 + 0.04*Math.sin(frame*0.01);
-  const aurora = ctx.createLinearGradient(0,20,0,100);
-  aurora.addColorStop(0,'transparent');
-  aurora.addColorStop(0.5,'rgba(79,200,232,1)');
-  aurora.addColorStop(1,'transparent');
-  ctx.fillStyle = aurora;
-  ctx.fillRect(0,20,W,80);
-  ctx.globalAlpha = 0.05 + 0.03*Math.sin(frame*0.013+1);
-  const aurora2 = ctx.createLinearGradient(0,40,0,120);
-  aurora2.addColorStop(0,'transparent');
-  aurora2.addColorStop(0.5,'rgba(100,255,180,1)');
-  aurora2.addColorStop(1,'transparent');
-  ctx.fillStyle = aurora2;
-  ctx.fillRect(0,40,W,80);
-  ctx.restore();
+  canvas.addEventListener('click', handleJump);
+  document.getElementById('startBtn').addEventListener('click', startGame);
 
-  ctx.save();
-  mountains.forEach(m => {
-    m.x -= speed * 0.15;
-    if(m.x < -W/4) m.x += W + W/4;
-    ctx.beginPath();
-    ctx.moveTo(m.x, GROUND);
-    ctx.lineTo(m.x + 60, GROUND - m.h);
-    ctx.lineTo(m.x + 120, GROUND);
-    ctx.fillStyle = 'rgba(20,50,90,0.6)';
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(m.x+60, GROUND-m.h);
-    ctx.lineTo(m.x+45, GROUND-m.h+20);
-    ctx.lineTo(m.x+75, GROUND-m.h+20);
-    ctx.fillStyle = 'rgba(180,220,255,0.4)';
-    ctx.fill();
-  });
-  ctx.restore();
+  // ==================== Game Lifecycle ====================
+  
+  function startGame() {
+    gameState = 'playing';
+    score = 0;
+    level = 1;
+    gameSpeed = GAME_CONFIG.INITIAL_SPEED;
+    frameCount = 0;
+    obstacles = [];
+    particles = [];
+    
+    obstacleSpawner.timer = 0;
+    obstacleSpawner.interval = GAME_CONFIG.BASE_OBSTACLE_INTERVAL;
+    
+    penguin.y = GROUND;
+    penguin.vy = 0;
+    penguin.jumps = 0;
+    penguin.dead = false;
+    penguin.legPhase = 0;
+    penguin.wingPhase = 0;
+    penguin.squish = 1;
+    
+    const overlay = document.getElementById('overlay');
+    overlay.classList.add('hidden');
+    document.getElementById('finalScore').textContent = '';
+    
+    if (animFrameId) cancelAnimationFrame(animFrameId);
+    gameLoop();
+  }
 
-  const grd = ctx.createLinearGradient(0,GROUND,0,H);
-  grd.addColorStop(0,'#c8e8f8');
-  grd.addColorStop(0.3,'#a0d0f0');
-  grd.addColorStop(1,'#7ab8e0');
-  ctx.fillStyle = grd;
-  ctx.fillRect(0,GROUND,W,H-GROUND);
+  function endGame() {
+    gameState = 'dead';
+    
+    if (score > bestScore) {
+      bestScore = score;
+      updateScoreDisplay('bestDisplay', bestScore);
+    }
+    
+    const overlay = document.getElementById('overlay');
+    overlay.classList.remove('hidden');
+    document.getElementById('overlayTitle').textContent = 'GAME OVER';
+    document.getElementById('overlaySub').textContent = 'The iceberg got you!';
+    document.getElementById('finalScore').textContent = 
+      `Score: ${score}${score === bestScore ? ' 🏆 New Best!' : ''}`;
+    document.getElementById('startBtn').textContent = 'TRY AGAIN';
+  }
 
-  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-  ctx.lineWidth = 1;
-  for(let i=0;i<6;i++){
+  // ==================== Particle System ====================
+  
+  function spawnJumpParticles() {
+    for (let i = 0; i < 8; i++) {
+      particles.push({
+        x: penguin.x,
+        y: penguin.y,
+        vx: (Math.random() - 0.5) * 3,
+        vy: Math.random() * -2 - 1,
+        life: 1,
+        r: Math.random() * 3 + 2,
+        color: `hsl(${180 + Math.random() * 40}, 80%, 70%)`
+      });
+    }
+  }
+
+  function spawnDeathParticles() {
+    for (let i = 0; i < 20; i++) {
+      particles.push({
+        x: penguin.x,
+        y: penguin.y - penguin.h / 2,
+        vx: (Math.random() - 0.5) * 8,
+        vy: Math.random() * -8 - 2,
+        life: 1,
+        r: Math.random() * 5 + 3,
+        color: `hsl(${200 + Math.random() * 30}, 70%, ${60 + Math.random() * 20}%)`
+      });
+    }
+  }
+
+  function updateParticles() {
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.2;
+      p.life -= 0.03;
+    });
+    particles = particles.filter(p => p.life > 0);
+  }
+
+  // ==================== Obstacle Management ====================
+  
+  function spawnObstacle() {
+    const types = ['small', 'medium', 'large', 'double'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const sizes = { small: { w: 22, h: 38 }, medium: { w: 30, h: 52 }, large: { w: 38, h: 66 } };
+    
+    if (type === 'double') {
+      obstacles.push({ x: W + 20, type: 'small', w: 22, h: 38 });
+      obstacles.push({ x: W + GAME_CONFIG.OBSTACLE_SPACING, type: 'small', w: 22, h: 38 });
+    } else {
+      const size = sizes[type];
+      obstacles.push({ x: W + 20, type, ...size });
+    }
+  }
+
+  function checkCollision(obstacle) {
+    const px = penguin.x;
+    const py = penguin.top;
+    const ox = obstacle.x + obstacle.w / 2;
+    const oy = GROUND - obstacle.h;
+    const dx = Math.abs(px - ox);
+    const dy = Math.abs((py + penguin.h / 2) - (oy + obstacle.h / 2));
+    
+    // Collision box with some padding
+    const penguinCollisionRadius = 14;
+    const horizontalCollision = dx < (penguinCollisionRadius + obstacle.w / 2 - 4);
+    const verticalCollision = dy < (penguin.h / 2 + obstacle.h / 2 - 8);
+    
+    return horizontalCollision && verticalCollision;
+  }
+
+  // ==================== Rendering ====================
+  
+  function drawBackground() {
+    // Sky gradient
+    const skyGradient = ctx.createLinearGradient(0, 0, 0, GROUND);
+    skyGradient.addColorStop(0, '#08112a');
+    skyGradient.addColorStop(1, '#0d2444');
+    ctx.fillStyle = skyGradient;
+    ctx.fillRect(0, 0, W, GROUND);
+
+    // Twinkling stars
+    stars.forEach(s => {
+      s.t += 0.03;
+      const alpha = 0.4 + 0.6 * Math.abs(Math.sin(s.t));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200, 235, 255, ${alpha})`;
+      ctx.fill();
+    });
+
+    // Aurora borealis effect
+    ctx.save();
+    ctx.globalAlpha = 0.07 + 0.04 * Math.sin(frameCount * 0.01);
+    const auroraGradient = ctx.createLinearGradient(0, 20, 0, 100);
+    auroraGradient.addColorStop(0, 'transparent');
+    auroraGradient.addColorStop(0.5, 'rgba(79, 200, 232, 1)');
+    auroraGradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = auroraGradient;
+    ctx.fillRect(0, 20, W, 80);
+
+    ctx.globalAlpha = 0.05 + 0.03 * Math.sin(frameCount * 0.013 + 1);
+    const auroraGradient2 = ctx.createLinearGradient(0, 40, 0, 120);
+    auroraGradient2.addColorStop(0, 'transparent');
+    auroraGradient2.addColorStop(0.5, 'rgba(100, 255, 180, 1)');
+    auroraGradient2.addColorStop(1, 'transparent');
+    ctx.fillStyle = auroraGradient2;
+    ctx.fillRect(0, 40, W, 80);
+    ctx.restore();
+
+    // Parallax mountains
+    ctx.save();
+    mountains.forEach(m => {
+      m.x -= gameSpeed * 0.15;
+      if (m.x < -W / 4) m.x += W + W / 4;
+      
+      ctx.beginPath();
+      ctx.moveTo(m.x, GROUND);
+      ctx.lineTo(m.x + 60, GROUND - m.h);
+      ctx.lineTo(m.x + 120, GROUND);
+      ctx.fillStyle = 'rgba(20, 50, 90, 0.6)';
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.moveTo(m.x + 60, GROUND - m.h);
+      ctx.lineTo(m.x + 45, GROUND - m.h + 20);
+      ctx.lineTo(m.x + 75, GROUND - m.h + 20);
+      ctx.fillStyle = 'rgba(180, 220, 255, 0.4)';
+      ctx.fill();
+    });
+    ctx.restore();
+
+    // Ground gradient
+    const groundGradient = ctx.createLinearGradient(0, GROUND, 0, H);
+    groundGradient.addColorStop(0, '#c8e8f8');
+    groundGradient.addColorStop(0.3, '#a0d0f0');
+    groundGradient.addColorStop(1, '#7ab8e0');
+    ctx.fillStyle = groundGradient;
+    ctx.fillRect(0, GROUND, W, H - GROUND);
+
+    // Ice patterns on ground
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, GROUND + 5 + i * 8);
+      ctx.lineTo(W, GROUND + 5 + i * 8);
+      ctx.stroke();
+    }
+
+    // Ground line
     ctx.beginPath();
-    ctx.moveTo(0, GROUND+5+i*8);
-    ctx.lineTo(W, GROUND+5+i*8);
+    ctx.moveTo(0, GROUND);
+    ctx.lineTo(W, GROUND);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.lineWidth = 2;
     ctx.stroke();
   }
 
-  ctx.beginPath();
-  ctx.moveTo(0,GROUND);
-  ctx.lineTo(W,GROUND);
-  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-}
+  function drawObstacle(obstacle) {
+    const bx = obstacle.x;
+    const by = GROUND;
+    const bw = obstacle.w;
+    const bh = obstacle.h;
 
-function drawObstacle(o) {
-  const bx = o.x, by = GROUND, bw = o.w, bh = o.h;
-  ctx.save();
-  ctx.beginPath();
-  const pts = [
-    [bx, by],
-    [bx + bw*0.1, by - bh*0.4],
-    [bx + bw*0.25, by - bh*0.7],
-    [bx + bw*0.45, by - bh],
-    [bx + bw*0.6, by - bh*0.8],
-    [bx + bw*0.75, by - bh*0.9],
-    [bx + bw*0.9, by - bh*0.5],
-    [bx + bw, by]
-  ];
-  ctx.moveTo(pts[0][0], pts[0][1]);
-  pts.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
-  ctx.closePath();
-
-  const ig = ctx.createLinearGradient(bx, by-bh, bx+bw, by);
-  ig.addColorStop(0,'#e8f6ff');
-  ig.addColorStop(0.4,'#a8d8f0');
-  ig.addColorStop(1,'#6ab0d8');
-  ctx.fillStyle = ig;
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.7)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(bx+bw*0.2, by-bh*0.5);
-  ctx.lineTo(bx+bw*0.35, by-bh*0.85);
-  ctx.lineTo(bx+bw*0.5, by-bh*0.6);
-  ctx.fillStyle = 'rgba(255,255,255,0.25)';
-  ctx.fill();
-  ctx.restore();
-}
-
-function drawPenguin() {
-  const px = penguin.x, py = penguin.y;
-  const sy = penguin.squish;
-  const sx = 2 - sy;
-
-  ctx.save();
-  ctx.translate(px, py);
-  ctx.scale(sx, sy);
-
-  ctx.save();
-  ctx.scale(1, 0.3);
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 18*sx, 8, 0, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
-  ctx.fill();
-  ctx.restore();
-
-  const legOff = state==='playing' ? Math.sin(penguin.legPhase)*5 : 0;
-  ctx.fillStyle = '#ff9900';
-  ctx.beginPath();
-  ctx.ellipse(-8, -4 + legOff, 7, 4, -0.3, 0, Math.PI*2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(8, -4 - legOff, 7, 4, 0.3, 0, Math.PI*2);
-  ctx.fill();
-
-  const bodyGrad = ctx.createRadialGradient(-4,-22,5,0,-20,22);
-  bodyGrad.addColorStop(0,'#3a3a4a');
-  bodyGrad.addColorStop(1,'#111118');
-  ctx.beginPath();
-  ctx.ellipse(0,-22,14,22,0,0,Math.PI*2);
-  ctx.fillStyle = bodyGrad;
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.ellipse(1,-20,8,14,0,0,Math.PI*2);
-  ctx.fillStyle = '#f0f0f8';
-  ctx.fill();
-
-  const wingAngle = state==='playing' ? Math.sin(penguin.wingPhase)*0.4 : 0.1;
-  ctx.save();
-  ctx.translate(-14,-24);
-  ctx.rotate(-0.3 - wingAngle);
-  ctx.beginPath();
-  ctx.ellipse(0,0,5,13,0.3,0,Math.PI*2);
-  ctx.fillStyle = '#1e1e28';
-  ctx.fill();
-  ctx.restore();
-
-  ctx.save();
-  ctx.translate(14,-24);
-  ctx.rotate(0.3 + wingAngle);
-  ctx.beginPath();
-  ctx.ellipse(0,0,5,13,-0.3,0,Math.PI*2);
-  ctx.fillStyle = '#1e1e28';
-  ctx.fill();
-  ctx.restore();
-
-  ctx.beginPath();
-  ctx.arc(0,-38,13,0,Math.PI*2);
-  ctx.fillStyle = '#111118';
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.ellipse(1,-38,8,9,0,0,Math.PI*2);
-  ctx.fillStyle = '#f0f0f8';
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(-4,-39,3,0,Math.PI*2);
-  ctx.fillStyle = '#fff';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(-4,-39,1.5,0,Math.PI*2);
-  ctx.fillStyle = '#111';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(-4.7,-39.7,0.6,0,Math.PI*2);
-  ctx.fillStyle = '#fff';
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(3,-36);
-  ctx.lineTo(10,-37);
-  ctx.lineTo(3,-34);
-  ctx.closePath();
-  ctx.fillStyle = '#ff8800';
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(0,-28,13,0.3,Math.PI-0.3);
-  ctx.lineWidth=4;
-  ctx.strokeStyle='#e84040';
-  ctx.stroke();
-  
-  ctx.beginPath();
-  ctx.moveTo(11,-30);
-  ctx.lineTo(15,-22);
-  ctx.lineTo(9,-20);
-  ctx.lineTo(9,-26);
-  ctx.fillStyle='#e84040';
-  ctx.fill();
-
-  ctx.restore();
-}
-
-function drawSnow() {
-  snowflakes.forEach(sf => {
-    sf.x -= speed * 0.3 + sf.spd;
-    sf.y += sf.spd * 0.5;
-    if(sf.x < 0) { sf.x = W; sf.y = Math.random()*GROUND; }
-    if(sf.y > GROUND) { sf.y = 0; sf.x = Math.random()*W; }
+    ctx.save();
+    
+    // Jagged iceberg shape
     ctx.beginPath();
-    ctx.arc(sf.x, sf.y, sf.s, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fill();
-  });
-}
+    const points = [
+      [bx, by],
+      [bx + bw * 0.1, by - bh * 0.4],
+      [bx + bw * 0.25, by - bh * 0.7],
+      [bx + bw * 0.45, by - bh],
+      [bx + bw * 0.6, by - bh * 0.8],
+      [bx + bw * 0.75, by - bh * 0.9],
+      [bx + bw * 0.9, by - bh * 0.5],
+      [bx + bw, by]
+    ];
+    
+    ctx.moveTo(points[0][0], points[0][1]);
+    points.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+    ctx.closePath();
 
-function drawParticles() {
-  particles.forEach(p => {
+    // Iceberg gradient
+    const iceGradient = ctx.createLinearGradient(bx, by - bh, bx + bw, by);
+    iceGradient.addColorStop(0, '#e8f6ff');
+    iceGradient.addColorStop(0.4, '#a8d8f0');
+    iceGradient.addColorStop(1, '#6ab0d8');
+    ctx.fillStyle = iceGradient;
+    ctx.fill();
+    
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Ice shine
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI*2);
-    ctx.fillStyle = p.color;
-    ctx.globalAlpha = p.life;
+    ctx.moveTo(bx + bw * 0.2, by - bh * 0.5);
+    ctx.lineTo(bx + bw * 0.35, by - bh * 0.85);
+    ctx.lineTo(bx + bw * 0.5, by - bh * 0.6);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
     ctx.fill();
-    ctx.globalAlpha = 1;
-  });
-}
+    
+    ctx.restore();
+  }
 
-function updateParticles() {
-  particles.forEach(p => {
-    p.x += p.vx; p.y += p.vy;
-    p.vy += 0.2;
-    p.life -= 0.03;
-  });
-  particles = particles.filter(p => p.life > 0);
-}
+  function drawPenguin() {
+    const px = penguin.x;
+    const py = penguin.y;
+    const sy = penguin.squish;
+    const sx = 2 - sy; // Squish effect
 
-function checkCollision(o) {
-  const px = penguin.x, py = penguin.top;
-  const ox = o.x + o.w/2, oy = GROUND - o.h;
-  const dx = Math.abs(px - ox);
-  const dy = Math.abs((py + penguin.h/2) - (oy + o.h/2));
-  return dx < (14 + o.w/2 - 4) && dy < (penguin.h/2 + o.h/2 - 8);
-}
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.scale(sx, sy);
 
-function loop() {
-  frame++;
-  ctx.clearRect(0,0,W,H);
-  drawBackground();
-  drawSnow();
+    // Shadow under penguin
+    ctx.save();
+    ctx.scale(1, 0.3);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 18 * sx, 8, 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+    ctx.fill();
+    ctx.restore();
 
-  if(state === 'playing') {
-    speed = 4 + score * 0.003;
-    level = Math.floor(score / 200) + 1;
-    obInterval = Math.max(45, 90 - level * 5);
+    // Feet
+    const legOffset = gameState === 'playing' ? Math.sin(penguin.legPhase) * 5 : 0;
+    ctx.fillStyle = '#ff9900';
+    ctx.beginPath();
+    ctx.ellipse(-8, -4 + legOffset, 7, 4, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(8, -4 - legOffset, 7, 4, 0.3, 0, Math.PI * 2);
+    ctx.fill();
 
-    penguin.vy += 0.7;
-    penguin.y += penguin.vy;
-    if(penguin.y >= GROUND) {
-      penguin.y = GROUND;
-      penguin.vy = 0;
-      penguin.jumps = 0;
-    }
+    // Body
+    const bodyGradient = ctx.createRadialGradient(-4, -22, 5, 0, -20, 22);
+    bodyGradient.addColorStop(0, '#3a3a4a');
+    bodyGradient.addColorStop(1, '#111118');
+    ctx.beginPath();
+    ctx.ellipse(0, -22, 14, 22, 0, 0, Math.PI * 2);
+    ctx.fillStyle = bodyGradient;
+    ctx.fill();
 
-    penguin.squish += (1 - penguin.squish) * 0.15;
-    if(penguin.y === GROUND) penguin.legPhase += 0.3;
-    penguin.wingPhase += 0.15;
+    // Belly
+    ctx.beginPath();
+    ctx.ellipse(1, -20, 8, 14, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#f0f0f8';
+    ctx.fill();
 
-    score++;
-    document.getElementById('scoreDisplay').textContent = score;
-    document.getElementById('levelDisplay').textContent = level;
+    // Wings
+    const wingAngle = gameState === 'playing' ? Math.sin(penguin.wingPhase) * 0.4 : 0.1;
+    ctx.save();
+    ctx.translate(-14, -24);
+    ctx.rotate(-0.3 - wingAngle);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 5, 13, 0.3, 0, Math.PI * 2);
+    ctx.fillStyle = '#1e1e28';
+    ctx.fill();
+    ctx.restore();
 
-    obTimer++;
-    if(obTimer >= obInterval) {
-      spawnObstacle();
-      obTimer = 0;
-    }
+    ctx.save();
+    ctx.translate(14, -24);
+    ctx.rotate(0.3 + wingAngle);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 5, 13, -0.3, 0, Math.PI * 2);
+    ctx.fillStyle = '#1e1e28';
+    ctx.fill();
+    ctx.restore();
 
-    obstacles.forEach(o => { o.x -= speed; });
-    obstacles = obstacles.filter(o => o.x > -60);
+    // Head
+    ctx.beginPath();
+    ctx.arc(0, -38, 13, 0, Math.PI * 2);
+    ctx.fillStyle = '#111118';
+    ctx.fill();
 
-    obstacles.forEach(o => {
-      if(checkCollision(o)) {
-        spawnDeathParticles();
-        showDead();
+    // Face white area
+    ctx.beginPath();
+    ctx.ellipse(1, -38, 8, 9, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#f0f0f8';
+    ctx.fill();
+
+    // Eyes
+    ctx.beginPath();
+    ctx.arc(-4, -39, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(-4, -39, 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(-4.7, -39.7, 0.6, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+
+    // Beak
+    ctx.beginPath();
+    ctx.moveTo(3, -36);
+    ctx.lineTo(10, -37);
+    ctx.lineTo(3, -34);
+    ctx.closePath();
+    ctx.fillStyle = '#ff8800';
+    ctx.fill();
+
+    // Mouth
+    ctx.beginPath();
+    ctx.arc(0, -28, 13, 0.3, Math.PI - 0.3);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#e84040';
+    ctx.stroke();
+
+    // Scarf
+    ctx.beginPath();
+    ctx.moveTo(11, -30);
+    ctx.lineTo(15, -22);
+    ctx.lineTo(9, -20);
+    ctx.lineTo(9, -26);
+    ctx.fillStyle = '#e84040';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawSnow() {
+    snowflakes.forEach(sf => {
+      sf.x -= gameSpeed * 0.3 + sf.spd;
+      sf.y += sf.spd * 0.5;
+      
+      // Wrap snowflakes
+      if (sf.x < 0) {
+        sf.x = W;
+        sf.y = Math.random() * GROUND;
       }
+      if (sf.y > GROUND) {
+        sf.y = 0;
+        sf.x = Math.random() * W;
+      }
+      
+      ctx.beginPath();
+      ctx.arc(sf.x, sf.y, sf.s, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.fill();
     });
   }
 
-  obstacles.forEach(drawObstacle);
-  drawPenguin();
-  drawParticles();
-  updateParticles();
+  function drawParticles() {
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.life;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+  }
 
-  animFrame = requestAnimationFrame(loop);
-}
+  // ==================== Game Loop ====================
+  
+  function gameLoop() {
+    frameCount++;
+    ctx.clearRect(0, 0, W, H);
+    
+    drawBackground();
+    drawSnow();
 
-loop();
+    if (gameState === 'playing') {
+      // Update difficulty
+      gameSpeed = GAME_CONFIG.INITIAL_SPEED + score * GAME_CONFIG.SPEED_INCREMENT;
+      level = Math.floor(score / GAME_CONFIG.LEVEL_INTERVAL) + 1;
+      obstacleSpawner.interval = Math.max(
+        GAME_CONFIG.MIN_OBSTACLE_INTERVAL,
+        GAME_CONFIG.BASE_OBSTACLE_INTERVAL - level * 5
+      );
+
+      // Physics update
+      penguin.vy += PHYSICS.GRAVITY;
+      penguin.y += penguin.vy;
+      
+      // Ground collision
+      if (penguin.y >= GROUND) {
+        penguin.y = GROUND;
+        penguin.vy = 0;
+        penguin.jumps = 0;
+      }
+
+      // Animation updates
+      penguin.squish += (1 - penguin.squish) * PHYSICS.SQUISH_RECOVERY;
+      if (penguin.y === GROUND) penguin.legPhase += PHYSICS.LEG_ANIMATION_SPEED;
+      penguin.wingPhase += PHYSICS.WING_ANIMATION_SPEED;
+
+      // Score increment
+      score++;
+      updateScoreDisplay('scoreDisplay', score);
+      document.getElementById('levelDisplay').textContent = level;
+
+      // Spawn obstacles
+      obstacleSpawner.timer++;
+      if (obstacleSpawner.timer >= obstacleSpawner.interval) {
+        spawnObstacle();
+        obstacleSpawner.timer = 0;
+      }
+
+      // Update obstacles
+      obstacles.forEach(o => {
+        o.x -= gameSpeed;
+      });
+      obstacles = obstacles.filter(o => o.x > -60);
+
+      // Collision detection
+      obstacles.forEach(o => {
+        if (checkCollision(o)) {
+          spawnDeathParticles();
+          endGame();
+        }
+      });
+    }
+
+    // Draw game objects
+    obstacles.forEach(drawObstacle);
+    drawPenguin();
+    drawParticles();
+    updateParticles();
+
+    animFrameId = requestAnimationFrame(gameLoop);
+  }
+
+  // ==================== Utilities ====================
+  
+  function updateScoreDisplay(elementId, value) {
+    const element = document.getElementById(elementId);
+    element.textContent = value;
+    element.classList.remove('pulse');
+    void element.offsetWidth; // Trigger reflow
+    element.classList.add('pulse');
+  }
+
+  // Start the game loop
+  gameLoop();
 </script>
 </body>
 </html>
