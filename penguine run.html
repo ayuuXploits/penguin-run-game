@@ -285,14 +285,12 @@ function spawnObstacle() {
 }
 
 function drawBackground() {
-  // Sky gradient
   const sky = ctx.createLinearGradient(0,0,0,GROUND);
   sky.addColorStop(0, '#08112a');
   sky.addColorStop(1, '#0d2444');
   ctx.fillStyle = sky;
   ctx.fillRect(0,0,W,GROUND);
 
-  // Stars twinkle
   stars.forEach(s => {
     s.t += 0.03;
     const alpha = 0.4 + 0.6*Math.abs(Math.sin(s.t));
@@ -302,7 +300,6 @@ function drawBackground() {
     ctx.fill();
   });
 
-  // Aurora
   ctx.save();
   ctx.globalAlpha = 0.07 + 0.04*Math.sin(frame*0.01);
   const aurora = ctx.createLinearGradient(0,20,0,100);
@@ -320,7 +317,6 @@ function drawBackground() {
   ctx.fillRect(0,40,W,80);
   ctx.restore();
 
-  // Distant mountains (slow parallax)
   ctx.save();
   mountains.forEach(m => {
     m.x -= speed * 0.15;
@@ -331,7 +327,6 @@ function drawBackground() {
     ctx.lineTo(m.x + 120, GROUND);
     ctx.fillStyle = 'rgba(20,50,90,0.6)';
     ctx.fill();
-    // Snow cap
     ctx.beginPath();
     ctx.moveTo(m.x+60, GROUND-m.h);
     ctx.lineTo(m.x+45, GROUND-m.h+20);
@@ -341,7 +336,6 @@ function drawBackground() {
   });
   ctx.restore();
 
-  // Ground
   const grd = ctx.createLinearGradient(0,GROUND,0,H);
   grd.addColorStop(0,'#c8e8f8');
   grd.addColorStop(0.3,'#a0d0f0');
@@ -349,7 +343,6 @@ function drawBackground() {
   ctx.fillStyle = grd;
   ctx.fillRect(0,GROUND,W,H-GROUND);
 
-  // Ice texture lines
   ctx.strokeStyle = 'rgba(255,255,255,0.2)';
   ctx.lineWidth = 1;
   for(let i=0;i<6;i++){
@@ -359,7 +352,6 @@ function drawBackground() {
     ctx.stroke();
   }
 
-  // Ground top glint
   ctx.beginPath();
   ctx.moveTo(0,GROUND);
   ctx.lineTo(W,GROUND);
@@ -370,10 +362,8 @@ function drawBackground() {
 
 function drawObstacle(o) {
   const bx = o.x, by = GROUND, bw = o.w, bh = o.h;
-  // Iceberg shape
   ctx.save();
   ctx.beginPath();
-  // Jagged top
   const pts = [
     [bx, by],
     [bx + bw*0.1, by - bh*0.4],
@@ -398,7 +388,6 @@ function drawObstacle(o) {
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // Shine
   ctx.beginPath();
   ctx.moveTo(bx+bw*0.2, by-bh*0.5);
   ctx.lineTo(bx+bw*0.35, by-bh*0.85);
@@ -417,7 +406,6 @@ function drawPenguin() {
   ctx.translate(px, py);
   ctx.scale(sx, sy);
 
-  // Shadow
   ctx.save();
   ctx.scale(1, 0.3);
   ctx.beginPath();
@@ -426,7 +414,6 @@ function drawPenguin() {
   ctx.fill();
   ctx.restore();
 
-  // Feet
   const legOff = state==='playing' ? Math.sin(penguin.legPhase)*5 : 0;
   ctx.fillStyle = '#ff9900';
   ctx.beginPath();
@@ -436,7 +423,6 @@ function drawPenguin() {
   ctx.ellipse(8, -4 - legOff, 7, 4, 0.3, 0, Math.PI*2);
   ctx.fill();
 
-  // Body
   const bodyGrad = ctx.createRadialGradient(-4,-22,5,0,-20,22);
   bodyGrad.addColorStop(0,'#3a3a4a');
   bodyGrad.addColorStop(1,'#111118');
@@ -445,13 +431,11 @@ function drawPenguin() {
   ctx.fillStyle = bodyGrad;
   ctx.fill();
 
-  // Belly
   ctx.beginPath();
   ctx.ellipse(1,-20,8,14,0,0,Math.PI*2);
   ctx.fillStyle = '#f0f0f8';
   ctx.fill();
 
-  // Wings
   const wingAngle = state==='playing' ? Math.sin(penguin.wingPhase)*0.4 : 0.1;
   ctx.save();
   ctx.translate(-14,-24);
@@ -471,19 +455,16 @@ function drawPenguin() {
   ctx.fill();
   ctx.restore();
 
-  // Head
   ctx.beginPath();
   ctx.arc(0,-38,13,0,Math.PI*2);
   ctx.fillStyle = '#111118';
   ctx.fill();
 
-  // Face patch
   ctx.beginPath();
   ctx.ellipse(1,-38,8,9,0,0,Math.PI*2);
   ctx.fillStyle = '#f0f0f8';
   ctx.fill();
 
-  // Eyes
   ctx.beginPath();
   ctx.arc(-4,-39,3,0,Math.PI*2);
   ctx.fillStyle = '#fff';
@@ -492,13 +473,11 @@ function drawPenguin() {
   ctx.arc(-4,-39,1.5,0,Math.PI*2);
   ctx.fillStyle = '#111';
   ctx.fill();
-  // Eye shine
   ctx.beginPath();
   ctx.arc(-4.7,-39.7,0.6,0,Math.PI*2);
   ctx.fillStyle = '#fff';
   ctx.fill();
 
-  // Beak
   ctx.beginPath();
   ctx.moveTo(3,-36);
   ctx.lineTo(10,-37);
@@ -507,7 +486,6 @@ function drawPenguin() {
   ctx.fillStyle = '#ff8800';
   ctx.fill();
 
-  // Scarf
   ctx.beginPath();
   ctx.arc(0,-28,13,0.3,Math.PI-0.3);
   ctx.lineWidth=4;
@@ -573,12 +551,10 @@ function loop() {
   drawSnow();
 
   if(state === 'playing') {
-    // Speed ramp
     speed = 4 + score * 0.003;
     level = Math.floor(score / 200) + 1;
     obInterval = Math.max(45, 90 - level * 5);
 
-    // Penguin physics
     penguin.vy += 0.7;
     penguin.y += penguin.vy;
     if(penguin.y >= GROUND) {
@@ -587,17 +563,14 @@ function loop() {
       penguin.jumps = 0;
     }
 
-    // Animations
     penguin.squish += (1 - penguin.squish) * 0.15;
     if(penguin.y === GROUND) penguin.legPhase += 0.3;
     penguin.wingPhase += 0.15;
 
-    // Score
     score++;
     document.getElementById('scoreDisplay').textContent = score;
     document.getElementById('levelDisplay').textContent = level;
 
-    // Obstacles
     obTimer++;
     if(obTimer >= obInterval) {
       spawnObstacle();
@@ -607,7 +580,6 @@ function loop() {
     obstacles.forEach(o => { o.x -= speed; });
     obstacles = obstacles.filter(o => o.x > -60);
 
-    // Collision
     obstacles.forEach(o => {
       if(checkCollision(o)) {
         spawnDeathParticles();
@@ -616,24 +588,14 @@ function loop() {
     });
   }
 
-  // Draw obstacles
   obstacles.forEach(drawObstacle);
-
-  // Draw penguin
   drawPenguin();
-
   drawParticles();
   updateParticles();
-
-  // HUD level stars
-  if(state === 'playing' && score % 200 === 0 && score > 0 && frame > 10) {
-    // Flash level up
-  }
 
   animFrame = requestAnimationFrame(loop);
 }
 
-// Initial draw
 loop();
 </script>
 </body>
