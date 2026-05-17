@@ -98,6 +98,7 @@ open index.html
 
 ## 🏗️ Architecture
 The entire game is written in vanilla HTML/CSS/JavaScript with zero dependencies.
+```
 index.html
 ├── Inline CSS          — UI, screens, shop, missions, animations
 ├── Canvas rendering    — Sky, ground, penguin, sea lion, obstacles, coins, particles
@@ -105,6 +106,7 @@ index.html
 ├── Save system         — localStorage with versioned save key
 ├── Mission engine      — Daily + long-term with progress tracking
 └── Shop system         — Skins, sceneries, consumable power-ups
+```
 
 
 
