@@ -1,71 +1,99 @@
-# PENGUIN RUN
-🎮 About....
-Penguin Run HD is a fully self-contained, single-file browser game. You play as a penguin sprinting across a frozen arctic landscape, leaping over icebergs while a relentless sea lion closes in from behind. The longer you survive, the faster it gets.
-No frameworks. No build tools. No server. Just open index.html and play.....
+# 🐧 PENGUIN RUN
 
-✨ Features
-Core Gameplay
+> *No frameworks. No build tools. No server. Just open `index.html` and play.*
 
-Endless runner with procedurally generated iceberg obstacles.
-Double jump mechanic for precise obstacle navigation.
-Dynamic difficulty — speed and obstacle frequency scale with your score
-Sea lion pursuer that appears at score 200 and never stops chasing
-Panic vignette — red screen edges pulse as the sea lion gets dangerously close
+---
 
-Progression System
+## 📑 Table of Contents
+- [🎮 About](#about)
+- [✨ Features](#features)
+  - [Core Gameplay](#core-gameplay)
+  - [Progression System](#progression-system)
+  - [Daily Chest](#daily-chest)
+  - [Missions](#missions)
+  - [Shop](#shop)
+  - [Visual Polish](#visual-polish)
+- [🕹️ Controls](#controls)
+- [🚀 Getting Started](#getting-started)
+- [🏗️ Architecture](#architecture)
+- [📸 Screenshots](#screenshots)
+- [🔧 Customisation](#customisation)
+- [🤝 Contributing](#contributing)
+- [📄 License](#license)
 
-Levelling based on score milestones
-XP & Coins earned through gameplay and mission completions
-Persistent save data via localStorage — your progress is never lost
-Daily login streak with escalating coin bonuses (3-day, 7-day, 14-day, 30-day rewards)
+---
 
-Daily Chest
+## 🎮 About
+**Penguin Run HD** is a fully self‑contained, single‑file browser game. You play as a penguin sprinting across a frozen arctic landscape, leaping over icebergs while a relentless sea lion closes in from behind. The longer you survive, the faster it gets.
 
-One free chest per day containing 10–200 random coins
-Come back tomorrow for the next one
+No frameworks. No build tools. No server. Just open `index.html` and play.
 
-Missions
+---
 
-4 daily missions (refreshed at midnight) across Bronze, Silver, and Gold tiers
-12 long-term achievements that track cumulative stats across all runs
-Missions track: score, coins, gems, jumps, dodges, runs played, level reached, and more
-Claim rewards directly from the Missions panel with animated popups
+## ✨ Features
 
-Shop
+### Core Gameplay
+- Endless runner with procedurally generated iceberg obstacles
+- **Double jump** mechanic for precise obstacle navigation
+- **Dynamic difficulty** — speed and obstacle frequency scale with your score
+- Sea lion pursuer appears at score **200** and never stops chasing
+- **Panic vignette** — red screen edges pulse as the sea lion gets dangerously close
 
-6 penguin skins — Classic, Royal Blue, Shadow, Firebird, Galaxy, and the legendary Gold skin
-6 world sceneries — Arctic Night, Lava Run, Jungle Dusk, Deep Space, Candy Land, Ice Desert
-3 consumable power-ups:
+### Progression System
+- Levelling based on score milestones
+- **XP & Coins** earned through gameplay and mission completions
+- Persistent save data via `localStorage` — your progress is never lost
+- **Daily login streak** with escalating coin bonuses (3‑day, 7‑day, 14‑day, 30‑day rewards)
 
-🧲 Coin Magnet — attracts nearby coins for 8 seconds
-🛡 Ice Shield — absorbs one fatal iceberg hit
-⚡ Speed Boost — turbo speed for 5 seconds
+### Daily Chest
+- One free chest per day containing **10–200 random coins**
+- Come back tomorrow for the next one
 
+### Missions
+- **4 daily missions** (refreshed at midnight) across Bronze, Silver, and Gold tiers
+- **12 long‑term achievements** that track cumulative stats across all runs
+- Missions track: score, coins, gems, jumps, dodges, runs played, level reached, and more
+- Claim rewards directly from the Missions panel with animated popups
 
+### Shop
+- **6 penguin skins** — Classic, Royal Blue, Shadow, Firebird, Galaxy, and the legendary Gold skin
+- **6 world sceneries** — Arctic Night, Lava Run, Jungle Dusk, Deep Space, Candy Land, Ice Desert
+- **3 consumable power‑ups**:
+  - 🧲 **Coin Magnet** — attracts nearby coins for 8 seconds
+  - 🛡 **Ice Shield** — absorbs one fatal iceberg hit
+  - ⚡ **Speed Boost** — turbo speed for 5 seconds
 
-Visual Polish
+### Visual Polish
+- Aurora borealis, parallax star fields, and animated snowfall
+- Procedural mountain backgrounds with scrolling parallax
+- Per‑skin particle effects (Galaxy trails, Firebird embers)
+- Camera shake on death and level‑up
+- Speed lines at high velocity
+- Footprint trail on the ground
+- Full coin collection particle effects and floating score text
+- Animated sea lion character with whiskers, eyes, and open‑mouth expressions
 
-Aurora borealis, parallax star fields, and animated snowfall
-Procedural mountain backgrounds with scrolling parallax
-Per-skin particle effects (Galaxy trails, Firebird embers)
-Camera shake on death and level-up
-Speed lines at high velocity
-Footprint trail on the ground
-Full coin collection particle effects and floating score text
-Animated sea lion character with whiskers, eyes, and open-mouth expressions
+---
 
+## 🕹️ Controls
+| Input | Action |
+|-------|--------|
+| `Space` / `↑` / Tap | Jump (hold for double jump) |
+| `S` | Open Shop |
+| `M` | Open Missions |
+| `Escape` | Close panels |
 
-🕹️ Controls
-InputActionSpace / ↑ / TapJump (hold for double jump)SOpen ShopMOpen MissionsEscapeClose panels
+---
 
-🚀 Getting Started
+## 🚀 Getting Started
 No installation required.
-bash# Clone the repo
+
+```bash
+# Clone the repo
 git clone https://github.com/ayuuXploits/penguin_V3.html.git
 
 # Open in your browser
 open index.html
-Or just download the HTML file and open it directly — it's fully self-contained.
 
 🏗️ Architecture
 The entire game is written in vanilla HTML/CSS/JavaScript with zero dependencies.
