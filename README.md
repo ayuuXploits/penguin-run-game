@@ -95,7 +95,7 @@ git clone https://github.com/ayuuXploits/penguin_V3.html.git
 # Open in your browser
 open index.html
 
-🏗️ Architecture
+## 🏗️ Architecture
 The entire game is written in vanilla HTML/CSS/JavaScript with zero dependencies.
 index.html
 ├── Inline CSS          — UI, screens, shop, missions, animations
