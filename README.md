@@ -108,7 +108,7 @@ index.html
 
 
 
-Key technical details:
+## Key technical details:
 
 Two layered <canvas> elements — main game canvas + speed lines overlay
 Procedural iceberg geometry using sine-wave point generation
@@ -116,11 +116,12 @@ Skin and scenery preview rendered live onto mini canvases in the shop
 All assets (fonts via Google Fonts CDN) loaded inline — no local files required
 
 
-📸 Screenshots
+## 📸 Screenshots
 Arctic NightLava RunDeep Space(default scenery, aurora borealis)(volcanic red sky, glowing ground)(cosmic nebulae, star field)
 
-🔧 Customisation
-Everything is data-driven. To add a new skin, append to the SKINS array:
+## 🔧 Customisation
+### Everything is data-driven. To add a new skin, append to the SKINS array:
+```
 javascript{
   id: 'myskin',
   name: 'My Skin',
@@ -131,7 +132,9 @@ javascript{
   scarf: '#ff00cc',  // scarf colour
   beak: '#ffaa00'    // beak colour
 }
-To add a new scenery, append to the SCENERIES array:
+```
+### To add a new scenery, append to the SCENERIES array:
+```
 javascript{
   id: 'myscene',
   name: 'My World',
@@ -144,6 +147,7 @@ javascript{
   aurora: true,       // show aurora borealis
   stars: true         // show star field
 }
+```
 
 📄 License
 MIT — do whatever you like with it.
