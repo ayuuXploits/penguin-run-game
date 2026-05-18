@@ -226,7 +226,7 @@ Everything is data-driven. Adding new content requires only a single array entry
 ## 📄 License
 
 ```
-MIT License — do whatever you like with it.
+Copyright (c) 2026 Ayush Kumar (ayuuXploits). All rights reserved.
 ```
 
 ---
